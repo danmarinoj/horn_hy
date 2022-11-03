@@ -1,6 +1,5 @@
-#+title: Acoustic Horn Design
-
-* Structure of the repo
+* Acoustic Horn Design
+** Structure of the repo
 
 The code is inteded to be modular.  Each file contains the
 implementation of a particular type horn as well as helper tools to
