@@ -45,7 +45,10 @@
     (/ 1 (- (- (/ 1 q-tc) (/ 1 q-ec)) q-mc))))
 
 (defn optimal-throat-area []
-  
+  (let ((c 344)
+         (omega-0 (calc-omega-0 f-l f-h))
+        (q-lc (calc-q-lc [alpha q-es q-ms f-l f-h]))
+    (/ (* omega-0 q-lc v-as) (* (+ alpha 1) c))
 
 (defn calc-T [f-c v-as s-t alpha]
   """Calculate the optimal T value
