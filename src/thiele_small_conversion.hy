@@ -1,4 +1,5 @@
 (import math)
+(require [hy.contrib.walk [let]])
 
 (defn em->ts-f-s [m-ms c-ms]
   """Convert to the resonance frequency of driver

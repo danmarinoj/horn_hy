@@ -1,5 +1,6 @@
 (import math)
 (import thiele_small_conversion)
+(require [hy.contrib.walk [let]])
 
 (defn angular-frequency [f]
   (* 2 math.pi f))
