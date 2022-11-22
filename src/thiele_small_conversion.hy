@@ -1,5 +1,13 @@
 (import math)
-(require [hy.contrib.walk [let]])
+
+(defn calc-mm-s [mm-d s-d]
+  """Calculate mm-s using mm-d
+  Arguments:
+  mm-d -- Total moving mass: voice coil + diaphragm
+  """
+  (let [r (math.sqrt (/ s-d math.pi))
+        rho-0 1.205]
+    (+ mm-d (/ (* 8 (** r 3) rho-0) 3))))
 
 (defn em->ts-f-s [m-ms c-ms]
   """Convert to the resonance frequency of driver
@@ -47,6 +55,6 @@
   Arguments:
   c-ms -- Compliance of the drivers suspension (m/N)
   s-d  -- Piston area of diaphram (m^2)"""
-  (let ((rho-0 1.205)    ; density of air (kg/m^3)
-         (c 344))        ; the speed of sound
+  (let [rho-0 1.205    ; density of air (kg/m^3)
+        c 344]         ; the speed of sound
     (* rho-0 (** c 2) c-ms (** s-d 2))))

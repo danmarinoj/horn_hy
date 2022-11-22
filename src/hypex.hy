@@ -4,7 +4,7 @@
   """Reference distance
   Arguments:
   f-c -- cutoff frequency"""
-  (let ((c 344))
+  (let [c 344]
     (/ c
        (* 2 math.pi f-c))))
 

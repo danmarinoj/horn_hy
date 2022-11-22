@@ -1,6 +1,5 @@
 (import math)
 (import thiele_small_conversion)
-(require [hy.contrib.walk [let]])
 
 (defn angular-frequency [f]
   (* 2 math.pi f))
@@ -10,8 +9,8 @@
   Arguments:
   f-l -- Lower corner frequency of system
   f-h -- Upper corner frequency of system"""
-  (let ((omega-l (angular-frequency f-l))
-         (omega-h (angular-frequency f-h)))
+  (let [omega-l (angular-frequency f-l)
+        omega-h (angular-frequency f-h)]
     (math.sqrt (* omega-l omega-h))))
 
 (defn calc-q-tc [f-l f-h]
@@ -19,9 +18,9 @@
   Arguments:
   f-l -- Lower corner frequency of system
   f-h -- Upper corner frequency of system"""
-  (let ((omega-l (angular-frequency f-l))
-         (omega-h (angular-frequency f-h))
-        (omega-0 (calc-omega-0 f-l f-h)))
+  (let [omega-l (angular-frequency f-l)
+        omega-h (angular-frequency f-h)
+        omega-0 (calc-omega-0 f-l f-h)]
     (/ omega-0 (+ omega-l omega-h))))
 
 (defn calc-alpha [omega-0 f-s]
@@ -30,7 +29,7 @@
   omega-0 -- System resonance frequency
   f-s     -- Resonance frequency of the driver
   """
-  (let ((omega-s (angular-frequency f-s)))
+  (let [omega-s (angular-frequency f-s)]
     (- (** (/ omega-0 omega-s) 2) 1)))
 
 (defn calc-q-lc [alpha q-es q-ms f-l f-h]
@@ -42,15 +41,16 @@
   f-l   -- Lower corner frequency of system
   f-h   -- Upper corner frequency of system
   """
-  (let ((q-tc (calc-q-tc f-l f-h))
-         ;; electrical loss factor
-         (q-ec (* (math.sqrt (+ alpha 1)) q-es))
-        (q-mc (* (math.sqrt (+ alpha 1)) q-ms)))
+  (let [q-tc (calc-q-tc f-l f-h)
+        q-ec (* (math.sqrt (+ alpha 1)) q-es)
+        q-mc (* (math.sqrt (+ alpha 1)) q-ms)]
     ;; check that q-ec < q-tc
     (if (not (< q-ec q-tc))
         (print (+ "Q_ec is not less than Q_tc\n"
-                  f"Q_ec={q-ec}, Q_tc={q-tc}")))
-    (/ 1 (- (- (/ 1 q-tc) (/ 1 q-ec)) q-mc))))
+                  "Q_ec=" (str q-ec)
+                  ", Q_tc=" (str q-tc)))
+        (print "Valid parameters"))
+    (/ 1 (- (- (/ 1 q-tc) (/ 1 q-ec)) (/ 1 q-mc)))))
 
 (defn optimal-throat-area [f-l f-h m-ms c-ms r-e
                            bl r-ms s-d]
@@ -67,18 +67,14 @@
   r-ms -- Mechanical resistance of drivers suspension
           (N*s/m)
   s-d  -- Piston area of diaphram (m^2)"""
-  (let ((c 344)
-         (f-s (thiele_small_conversion.em->ts-f-s
-                m-ms c-ms))
-        (omega-0 (calc-omega-0 f-l f-h))
-        (alpha (calc-alpha omega-0 f-s))
-        (q-es (thiele_small_conversion.em->ts-q-es
-                r-e f-s bl c-ms))
-        (q-ms (thiele_small_conversion.em->ts-q-ms
-                f-s r-ms c-ms))
-        (q-lc (calc-q-lc alpha q-es q-ms f-l f-h))
-        (v-as (thiele_small_conversion.em->ts-v-as
-                c-ms s-d)))
+  (let [c 344
+        f-s (em->ts-f-s m-ms c-ms)
+        omega-0 (calc-omega-0 f-l f-h)
+        alpha (calc-alpha omega-0 f-s)
+        q-es (em->ts-q-es r-e f-s bl c-ms)
+        q-ms (em->ts-q-ms f-s r-ms c-ms)
+        q-lc (calc-q-lc alpha q-es q-ms f-l f-h)
+        v-as (em->ts-v-as c-ms s-d)]
     (/ (* omega-0 q-lc v-as) (* (+ alpha 1) c))))
 
 (defn optimal-T [f-c f-l f-h m-ms c-ms r-e
@@ -86,7 +82,7 @@
   """The optimal T value for hypex computed
      using reactance anulling
   Arguments:
-  f-c   -- The cutoff frequency of the horn
+  f-c  -- The cutoff frequency of the horn
   f-l  -- Lower corner frequency of system
   f-h  -- Upper corner frequency of system
   m-ms -- Mass of the driver diaphragm and voice-coil
@@ -97,15 +93,13 @@
   r-ms -- Mechanical resistance of drivers suspension
           (N*s/m)
   s-d  -- Piston area of diaphram (m^2)"""
-  (let ((omega-c (angular-frequency f-c))
-         (c 344)
-        (f-s (thiele_small_conversion.em->ts-f-s
-               m-ms c-ms))
-        (omega-0 (calc-omega-0 f-l f-h))
-        (alpha (calc-alpha omega-0 f-s))
-        (v-as (thiele_small_conversion.em->ts-v-as
-                c-ms s-d))
-        (s-t (optimal-throat-area f-l f-h m-ms c-ms
-                                  r-e bl r-ms s-d)))
+  (let [omega-c (angular-frequency f-c)
+        c 344
+        f-s (em->ts-f-s m-ms c-ms)
+        omega-0 (calc-omega-0 f-l f-h)
+        alpha (calc-alpha omega-0 f-s)
+        v-as (em->ts-v-as c-ms s-d)
+        s-t (optimal-throat-area f-l f-h m-ms c-ms
+                                 r-e bl r-ms s-d)]
     (/ (* omega-c v-as)
        (* c s-t (+ 1 alpha)))))
