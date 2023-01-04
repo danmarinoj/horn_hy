@@ -1,23 +1,27 @@
 (import math)
 
-(defn calc-mm-s [mm-d s-d]
-  """Calculate mm-s using mm-d
+(defn calc-m-ms [m-md s-d]
+  """Calculate m-ms using m-md
   Arguments:
   mm-d -- Total moving mass: voice coil + diaphragm
+  s-d  -- The surface area of the diaphragm
+          (this is used to calculate r)
   """
   (let [r (math.sqrt (/ s-d math.pi))
         rho-0 1.205]
-    (+ mm-d (/ (* 8 (** r 3) rho-0) 3))))
+    (+ m-md (/ (* 8 (** r 3) rho-0) 3))))
 
-(defn em->ts-f-s [m-ms c-ms]
+(defn em->ts-f-s [m-md c-ms s-d]
   """Convert to the resonance frequency of driver
   Arguments:
-  m-ms -- Mass of the driver diaphragm and voice-coil
-          assembly, including acoustic load (kg)
+  m-md -- Mass of the driver diaphragm and voice-coil
+          assembly (kg)
   c-ms -- Compliance of the driver's suspension (m/N)
+  s-d  -- Surface area of the diaphragm (m^2)
   """
-  (/ 1
-     (* 2 math.pi (math.sqrt (* m-ms c-ms)))))
+  (let [m-ms (calc-m-ms m-md s-d)]
+    (/ 1
+     (* 2 math.pi (math.sqrt (* m-ms c-ms))))))
 
 (defn em->ts-q-es [r-e f-s bl c-ms]
   """Convert to the damping by electrical resistance

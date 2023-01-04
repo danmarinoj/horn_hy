@@ -1,5 +1,5 @@
 (import math)
-(import thiele_small_conversion)
+(import thiele_small_conversion *)
 
 (defn angular-frequency [f]
   (* 2 math.pi f))
@@ -95,7 +95,7 @@
   s-d  -- Piston area of diaphram (m^2)"""
   (let [omega-c (angular-frequency f-c)
         c 344
-        f-s (em->ts-f-s m-ms c-ms)
+        f-s (em->ts-f-s m-ms c-ms sd)
         omega-0 (calc-omega-0 f-l f-h)
         alpha (calc-alpha omega-0 f-s)
         v-as (em->ts-v-as c-ms s-d)
